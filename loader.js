@@ -30,7 +30,8 @@ const loadModules = async (bytecode) => {
   
     const wmod = await WebAssembly.compile(bytecode);
     const CALLDEST = Module.CALLDEST = {
-      DRONEHEALTH: 0
+      DRONEHEALTH: 0,
+      RAINBOW: 1
     };
   
     memory = Module.memory = await new Promise(res => {

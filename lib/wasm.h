@@ -10,9 +10,10 @@ typedef short i16_t;
 typedef unsigned short u16_t;
 typedef char i8_t;
 typedef unsigned char u8_t;
+typedef u8_t bool_t;
 
-#ifdef __cplusplus
-    #define NULL nullptr;
-#else
-    #define NULL 0
+#ifndef __cplusplus
+    #define nullptr (void*) 0
 #endif
+
+#define NULL(X) (void*) X 

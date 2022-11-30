@@ -5,15 +5,15 @@ STACK_TOP=16
 
 clang \
    --target=wasm32 \
-   -O3 \
    -flto \
    -pthread \
    -nostdlib \
-   -Wl,--no-entry \
+   -O3 \
    -Wl,--lto-O3 \
+   -Wl,--strip-all \
+   -Wl,--no-entry \
    -Wl,--stack-first \
    -Wl,-z,stack-size=$[65536 * STACK_TOP / 8] \
-   -Wl,--strip-all \
    -Wl,--import-memory \
    -Wl,--initial-memory=$[65536 * INITIAL_MEM] \
    -Wl,--max-memory=$[65536 * 65536] \

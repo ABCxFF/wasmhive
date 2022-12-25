@@ -1,1 +1,4 @@
 .vscode
+out/*.bin
+out/*.wat
+out/*.wasm

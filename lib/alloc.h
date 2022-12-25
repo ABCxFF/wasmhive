@@ -1,6 +1,5 @@
 #pragma once
 
-#include "call.h"
 #include "wasm.h"
 
 #ifdef __cplusplus

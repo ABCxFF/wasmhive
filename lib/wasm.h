@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * Wasm types integration
+ */
+
 typedef double f64_t;
 typedef float f32_t;
 typedef long long i64_t;

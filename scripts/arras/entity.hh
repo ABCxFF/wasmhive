@@ -67,36 +67,36 @@ struct entity_data_t {
     // #offset=0x50
     interp_f64_t health;
     // #offset=0x68
+    f64_t __unknown1[1];
+    // #offset=0x70
     interp_f64_t shield;
-    // #offset=0x80
-    f64_t alpha;
     // #offset=0x88
-    f64_t size;
+    f64_t alpha;
     // #offset=0x90
+    f64_t size;
+    // #offset=0x98
     mockup_t mockup;
-    // #offset=0xe8
-    i32_t __unknown1[4];
-    // #offset=0xf8
+    // #offset=0xf0
+    i32_t __unknown2[4];
+    // #offset=0x100
     i32_t score;
-    // #offset=0xfc
+    // #offset=0x104
     str_t name;
-    // #offset=0x108
+    // #offset=0x110
     vec_t<gun_t> guns;
-    // #offset=0x114
+    // #offset=0x11c
     vec_t<entity_data_t> turrets;
-    // #offset=0x120
-    i16_t mockup_idx;
-    // #offset=0x122
-    i16_t layer;
-    // #offset=0x124
-    i16_t __unknown2[1];
-    // #offset=0x126
-    bool_t is_twiggle;
-    // #offset=0x127
-    bool_t is_tank_reversed;
     // #offset=0x128
-    bool_t is_health_shown;
-    // #offset=0x129
+    i16_t mockup_idx;
+    // #offset=0x12a
+    i16_t layer;
+    // #offset=0x12c
+    i16_t __unknown3[1];
+    // #offset=0x12e
+    bool_t is_twiggle;
+    // #offset=0x12f
+    bool_t is_tank_reversed;
+    // #offset=0x130
     u8_t body_color;
 };
 
@@ -144,6 +144,17 @@ struct rough_ent_array_t {
 
     static rough_ent_array_t* get_rough_ent_array() {
         // all magic
-        return (rough_ent_array_t*) &((i32_t**) 0x1200b8)[1][128];
+        /*
+            var19 = *var0
+            var10 = var19 + 16
+            var0 = *(var10 + 524)
+            var2 = var0 + 8
+        */
+        char* magic = (char*) 0x121248;
+        magic = (char*) *(i32_t*) magic;
+        magic += 16;
+        magic += 524;
+        magic -= 4;
+        return (rough_ent_array_t*) magic;
     }
 };

@@ -1,3 +1,76 @@
+// ==UserScript==
+// @name         arras.io fov script
+// @version      1.0.0
+// @description  fov
+// @namespace    github.com/ABCxFF/wasmhive
+// @author       ABCxFF
+//
+// @match        *://arras.io/static/*/app*
+// @run-at       document-start
+// @grant        none
+//
+// @require      https://greasyfork.org/scripts/455470-wail/code/WAIL.js?version=1121558
+// ==/UserScript==
+
+/** begin vanilla js **/
+if (!Array.isArray(globalThis.INJ)) globalThis.INJ = [];
+
+WebAssembly.instantiateStreaming = async (r, i) => WebAssembly.instantiate(await (await r).arrayBuffer(), i);
+
+const inst = WebAssembly.instantiate;
+WebAssembly.instantiate = async function (buffer, imports) {
+    if (!(buffer instanceof Uint8Array || buffer instanceof ArrayBuffer)) return inst(buffer, imports);
+    const wail = new WailParser(new Uint8Array(buffer));
+
+    (imports.x = {}).inj = (...a) => {
+        for (const inj of globalThis.INJ) inj(...a);
+    }
+    const inj = wail.addImportEntry({
+        moduleStr: "x",
+        fieldStr: "inj",
+        kind: "func",
+        type: wail.addTypeEntry({
+            form: "func",
+            params: ['i32'],
+        })
+    });
+    wail.addCodeElementParser(null, ({ bytes, index }) => {
+
+        const SEARCH = [OP_BLOCK, 64, OP_BLOCK, 64, OP_BLOCK, 64, OP_BLOCK, 64, OP_BLOCK, 64, OP_BLOCK, 64, OP_GET_LOCAL, '*', OP_IF];
+
+        s: for (let i = 0; i < bytes.length - SEARCH.length; ++i) {
+            for (let j = 0; j < SEARCH.length; ++j) {
+                if (bytes[i + j] === SEARCH[j] || SEARCH[j] === "*") continue;
+                continue s;
+            }
+            let offset = i;
+            const SEARCH2 = new Uint8Array(new Float32Array([9223371487098962000.0]).buffer);
+            let bytes2 = bytes.slice(i + SEARCH.length)
+            s2: for (let i = 0; i < bytes2.length - SEARCH2.length; ++i) {
+                for (let j = 0; j < SEARCH2.length; ++j) {
+                    if (bytes2[i + j] === SEARCH2[j]) continue;
+                    continue s2;
+                }
+
+                const varIdx = bytes2[bytes2.indexOf(OP_GET_LOCAL) + 1]
+
+                return new Uint8Array([
+                    ...bytes.slice(0, offset + SEARCH.length - 1),
+                    OP_GET_LOCAL, varIdx,
+                    OP_CALL, ...VarUint32ToArray(inj.i32()),
+                    ...bytes.slice(offset + SEARCH.length - 1)
+                ]);
+            }
+            continue s;
+        }
+
+        return bytes;
+    });
+    wail.parse();
+    return inst(wail.write(), imports);
+}
+/** end vanilla js **/
+
 ;const eval = globalThis.eval;
 
 const loadModules = async (bytecode) => {
@@ -125,3 +198,4 @@ const loadModules = async (bytecode) => {
 
   if (wasm.exports.main) wasm.exports.main();
 };
+loadModules("AGFzbQEAAAABHAZgAX8Bf2ACf38AYAAAYAF/AGACf38Bf2AAAX8CJAIDZW52Bm1lbW9yeQIDEoCABANlbnYLZXZhbHdpdGhyZWYAAQMKCQIAAwAABAAFBAQFAXABAgIGDQJ/AUGAgAgLfwFBAAsHLAYGbWFsbG9jAAUEZnJlZQADBHB1c2gABANwb3AAAgRjYWxsAAYEbWFpbgAJCAEBCQcBAEEBCwEHDAEBCscECVsAAkACQAJAQdCICEEAQQH+SAIADgIAAQILQYCACEEAQTr8CAAAQcCACEEAQZAI/AsAQdCICEEC/hcCAEHQiAhBf/4AAgAaDAELQdCICEEBQn/+AQIAGgv8CQALDgAjAA8gACQAIwAPQQALAgALDgAjAA8gACQAIwAPQQALBABBAAsmAAJAIABBAnRB0ICIgABqKAIAIgANAEF/DwsgASAAEYCAgIAAAAvRAgIGfwF9IAAgACgCACIBNgIIAkAgAUEAIAAoAgwiAiABSxsoAgQgACgCECAAQRRqKAIAIgNsIABBGGooAgAiBGogA2wgBGoiBXMiBkEBIAZBfmpB/f///wdJGy0AAEH1AEcNAAJAAkBBAiABQRhqIgFBACACIAFLGyIBKAIEIAUgA2wgBGogA2wgBGogA2wgBGogA2wgBGogA2wgBGoiBiADbCAEaiIDcyIEIARBfmpB/f///wdJGyIERQ0AQwAAAAAhByAEQf////8HRw0BIAEoAgAgBmq+IQcMAQsgBiABKAIAarIhBwsgASADQf////8HczYCBCABIAe7RDMzMzMzM/M/orYiBzgCACABIAe8IAAoAhAgACgCFCIDbCAAKAIYIgBqIANsIABqIANsIABqIANsIABqIANsIABqIANsIABqIANsIABqazYCAAtBAAtAAQF/QQBBAC0AwICIgAAiAEEBajoAwICIgAAgAEECdEHQgIiAAGpBgYCAgAA2AgBBgICIgAAgABCAgICAAEEACwgAEIiAgIAACws9AQE6KGhvb2spID0+IHsgSU5KLnB1c2goKGJhc2UpID0+IHsgaG9vayhiYXNlICsgMHg3OCk7IH0pOyB9AA==");

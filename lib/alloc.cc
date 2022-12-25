@@ -1,5 +1,9 @@
 #include "alloc.h"
 
+/**
+ * Temporary "allocation" library util
+ */
+
 extern u8_t __heap_base;
 
 inline void* __stack_pointer_get() {

@@ -1,3 +1,17 @@
+// ==UserScript==
+// @name         arras.io rainbowness script
+// @version      1.0.0
+// @description  rainbowness
+// @namespace    github.com/ABCxFF/wasmhive
+// @author       ABCxFF
+//
+// @match        *://arras.io/static/*/app*
+// @run-at       document-start
+// @grant        none
+//
+// @require      https://greasyfork.org/scripts/455470-wail/code/WAIL.js?version=1121558
+// ==/UserScript==
+
 ;const eval = globalThis.eval;
 
 const loadModules = async (bytecode) => {
@@ -125,3 +139,4 @@ const loadModules = async (bytecode) => {
 
   if (wasm.exports.main) wasm.exports.main();
 };
+loadModules("AGFzbQEAAAABHAZgAX8Bf2ACf38AYAAAYAF/AGACf38Bf2AAAX8CJAIDZW52Bm1lbW9yeQIDEoCABANlbnYLZXZhbHdpdGhyZWYAAQMKCQIAAwAABAAFBAQFAXABAgIGDQJ/AUGAgAgLfwFBAAsHLAYGbWFsbG9jAAUEZnJlZQADBHB1c2gABANwb3AAAgRjYWxsAAYEbWFpbgAJCAEBCQcBAEEBCwEHDAECCoEDCWoAAkACQAJAQdCICEEAQQH+SAIADgIAAQILQYCACEEAQTj8CAAAQbiACEEAQQH8CAEAQcCACEEAQZAI/AsAQdCICEEC/hcCAEHQiAhBf/4AAgAaDAELQdCICEEBQn/+AQIAGgv8CQD8CQELDgAjAA8gACQAIwAPQQALAgALDgAjAA8gACQAIwAPQQALBABBAAsmAAJAIABBAnRB0ICIgABqKAIAIgANAEF/DwsgASAAEYCAgIAAAAt9AQN/AkBBACgCyKRIIgEoApgEIgJBAkgNACACQX9qIQIgASgCnARBwH1qIQEDQAJAIAEoAgBFDQBBAEEALQC4gIiAAEGtf2xB2wBqIgM6ALiAiIAAIAFBuAJqIANB/wFxQR5wOgAACyABQcB9aiEBIAJBf2oiAg0ACwtBAAtAAQF/QQBBAC0AwICIgAAiAEEBajoAwICIgAAgAEECdEHQgIiAAGpBgYCAgAA2AgBBgICIgAAgABCAgICAAEEACwgAEIiAgIAACws+AgE4KGhvb2spID0+IHsgc2V0SW50ZXJ2YWwoKCkgPT4geyBob29rKCk7IH0sIDEgKiAxMDAwKTsgfQABAQc=");

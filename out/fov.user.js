@@ -179,6 +179,7 @@ const loadModules = async (bytecode) => {
     env: {
       memory,
       d: () => {debugger},
+      as: (addr) => top.alert(decodeFromMemory(addr)),
       ls: (addr) => top.console.log(decodeFromMemory(addr)),
       lf: (val) =>top.console.log(val),
       li: (val) => top.console.log(val),

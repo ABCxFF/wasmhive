@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 /** begin vanilla js **/
-let INJ = () => {};
+if (!Array.isArray(globalThis.INJ)) globalThis.INJ = [];
 
 WebAssembly.instantiateStreaming = async (r, i) => WebAssembly.instantiate(await (await r).arrayBuffer(), i);
 
@@ -22,44 +22,46 @@ WebAssembly.instantiate = async function (buffer, imports) {
     if (!(buffer instanceof Uint8Array || buffer instanceof ArrayBuffer)) return inst(buffer, imports);
     const wail = new WailParser(new Uint8Array(buffer));
 
-    (imports.x = {}).inj = (...a) => INJ(...a);
+    (imports.x = {}).inj = (...a) => {
+        for (const inj of globalThis.INJ) inj(...a);
+    }
     const inj = wail.addImportEntry({
         moduleStr: "x",
         fieldStr: "inj",
         kind: "func",
         type: wail.addTypeEntry({
             form: "func",
-            params: ['i32', 'i32', 'i32', 'i32', 'i32'],
+            params: ['i32'],
         })
     });
     wail.addCodeElementParser(null, ({ bytes, index }) => {
-        const SEARCH = [OP_CALL, ...VarUint32ToArray(index)];
+
+        const SEARCH = [OP_BLOCK, 64, OP_BLOCK, 64, OP_BLOCK, 64, OP_BLOCK, 64, OP_BLOCK, 64, OP_BLOCK, 64, OP_GET_LOCAL, '*', OP_IF];
+
         s: for (let i = 0; i < bytes.length - SEARCH.length; ++i) {
             for (let j = 0; j < SEARCH.length; ++j) {
-                if (bytes[i + j] === SEARCH[j]) continue;
+                if (bytes[i + j] === SEARCH[j] || SEARCH[j] === "*") continue;
                 continue s;
             }
-
-            const SEARCH2 = new Uint8Array(new Float64Array([0.01227184630308513]).buffer);
-            s2: for (let i = 0; i < bytes.length - SEARCH2.length; ++i) {
+            let offset = i;
+            const SEARCH2 = new Uint8Array(new Float32Array([9223371487098962000.0]).buffer);
+            let bytes2 = bytes.slice(i + SEARCH.length)
+            s2: for (let i = 0; i < bytes2.length - SEARCH2.length; ++i) {
                 for (let j = 0; j < SEARCH2.length; ++j) {
-                    if (bytes[i + j] === SEARCH2[j]) continue;
+                    if (bytes2[i + j] === SEARCH2[j]) continue;
                     continue s2;
                 }
 
+                const varIdx = bytes2[bytes2.indexOf(OP_GET_LOCAL) + 1]
+
                 return new Uint8Array([
-                    OP_GET_LOCAL, 0,
-                    OP_GET_LOCAL, 1,
-                    OP_GET_LOCAL, 2,
-                    OP_GET_LOCAL, 3,
-                    OP_GET_LOCAL, 4,
+                    ...bytes.slice(0, offset + SEARCH.length - 1),
+                    OP_GET_LOCAL, varIdx,
                     OP_CALL, ...VarUint32ToArray(inj.i32()),
-                    ...bytes
+                    ...bytes.slice(offset + SEARCH.length - 1)
                 ]);
-
             }
-
-            break;
+            continue s;
         }
 
         return bytes;
@@ -177,6 +179,7 @@ const loadModules = async (bytecode) => {
     env: {
       memory,
       d: () => {debugger},
+      as: (addr) => top.alert(decodeFromMemory(addr)),
       ls: (addr) => top.console.log(decodeFromMemory(addr)),
       lf: (val) =>top.console.log(val),
       li: (val) => top.console.log(val),
@@ -196,4 +199,4 @@ const loadModules = async (bytecode) => {
 
   if (wasm.exports.main) wasm.exports.main();
 };
-loadModules("AGFzbQEAAAABHAZgAX8Bf2ACf38AYAAAYAF/AGACf38Bf2AAAX8CGgIDZW52Bm1lbW9yeQIDEoCABANlbnYBZQABAwoJAgADAAAEAAUEBAUBcAECAgYNAn8BQYCACAt/AUEACwcsBgZtYWxsb2MABQRmcmVlAAMEcHVzaAAEA3BvcAACBGNhbGwABgRtYWluAAkIAQEJBwEAQQELAQcMAQEK8wMJWwACQAJAAkBB0IgIQQBBAf5IAgAOAgABAgtBgIAIQQBBOPwIAABBwIAIQQBBkAj8CwBB0IgIQQL+FwIAQdCICEF//gACABoMAQtB0IgIQQFCf/4BAgAaC/wJAAsOACMADyAAJAAjAA9BAAsCAAsOACMADyAAJAAjAA9BAAsEAEEACyYAAkAgAEECdEHQgIiAAGooAgAiAA0AQX8PCyABIAARgICAgAAAC/0BAQV/AkBBACgCyKRIIgEoApgEIgJBAkgNAEEBIQMgASgCnAQhBAJAIAJBAkYNACACQX9qIgFBAXEhBSAEQYB7aiECIAFBfnEhA0EAIQEDQAJAIAJBwAJqKAIARQ0AIAJByARqKAIAQcCEPUgNACACQfgEakEDOgAACwJAIAIoAgBFDQAgAkGIAmooAgBBwIQ9SA0AIAJBuAJqQQM6AAALIAJBgHtqIQIgAyABQQJqIgFHDQALIAVFDQEgAUEBaiEDCyAEQQAgA2siAUHAAmxqIgIoAgBFDQAgAkGIAmooAgBBwIQ9SA0AIAQgAUHAAmxqQbgCakEDOgAAC0EAC0ABAX9BAEEALQDAgIiAACIAQQFqOgDAgIiAACAAQQJ0QdCAiIAAakGBgICAADYCAEGAgIiAACAAEICAgIAAQQALCAAQiICAgAALCzsBATgoaG9vaykgPT4geyBzZXRJbnRlcnZhbCgoKSA9PiB7IGhvb2soKTsgfSwgMSAqIDEwMDApOyB9AA==");
+loadModules("AGFzbQEAAAABHAZgAX8Bf2ABfwBgAn9/AGAAAGACf38Bf2AAAX8CIwMDZW52Bm1lbW9yeQIDEoCABANlbnYCYXMAAQNlbnYBZQACAwsKAwABAAAEAAAFBAQFAXABAgIGDQJ/AUGAgAgLfwFBAAsHLAYGbWFsbG9jAAYEZnJlZQAEBHB1c2gABQNwb3AAAwRjYWxsAAcEbWFpbgALCAECCQcBAEEBCwEJDAEBCvQJClwAAkACQAJAQfCICEEAQQH+SAIADgIAAQILQYCACEEAQdQA/AgAAEHggAhBAEGQCPwLAEHwiAhBAv4XAgBB8IgIQX/+AAIAGgwBC0HwiAhBAUJ//gECABoL/AkACw4AIwAPIAAkACMAD0EACwIACw4AIwAPIAAkACMAD0EACwQAQQALJgACQCAAQQJ0QfCAiIAAaigCACIADQBBfw8LIAEgABGAgICAAAALxgQCCH8BfUEAIQEgACgCACICKAIAIgMhBAJAIAAoAgQiBUEASA0AIAVBAXRBA2ohBiACKAIIIQcgAigCBCEIIAMhBANAIAQgCGwgB2ohBCAGQX9qIgZBAUsNAAsLAkACQEECIAAoAggiCCgCBCAEcyIEIARBfmpB/f///wdJGyIEQf////8HRg0AIAQNASAIKAIAIQACQCAFQQF0IghBAXIiBEEBSA0AIARBB3EhByAIQQZxIQUgAigCCCEEIAIoAgQhBgNAIAMgBmwgBGohAyAHQX9qIgcNAAsgCEEHSQ0AIAVBf3MgCGohBwNAIAMgBmwgBGogBmwgBGogBmwgBGogBmwgBGogBmwgBGogBmwgBGogBmwgBGogBmwgBGohAyAHQXhqIgdBfkkNAAsLIAMgAGoPCwJAIAVBAXQiBUEBciIEQQFIDQAgBEEHcSEHIAVBBnEhASACKAIIIQQgAigCBCEGA0AgAyAGbCAEaiEDIAdBf2oiBw0ACyAFQQdJDQAgAUF/cyAFaiEHA0AgAyAGbCAEaiAGbCAEaiAGbCAEaiAGbCAEaiAGbCAEaiAGbCAEaiAGbCAEaiAGbCAEaiEDIAdBeGoiB0F+SQ0ACwsgCCAIKAIAIANqNgIAIAAoAggiBCAEKgIAIgm8IANrNgIAQX8hASAJu0QAAOD////vQWQNACAJQwAAAABgIQMCQAJAIAmLQwAAAE9dRQ0AIAmoIQQMAQtBgICAgHghBAsgBEEAIAMbQQAgCUMAAIBPXRshAQsgAQu1AwEHfyOAgICAAEEQayIBJICAgIAAIAAgACgCACICNgIIAkAgAkEAIAAoAgwiAyACSxsoAgQgACgCECAAQRRqKAIAIgRsIABBGGooAgAiBWogBGwgBWpzIgRBASAEQX5qQf3///8HSRstAABB4gBHDQAgAUEGNgIEIAEgAEEQaiIFNgIAIAEgAkEwaiICQQAgAyACSxs2AgggARCIgICAACICQQN2QQFxIgMgAkECdkEBcSIGakEIQQcgAkEBcRsiBEEDaiAEIAJBAnEbIgdqIQQCQCACQRBxRQ0AIAEgBTYCACABIAQ2AgQgASAAKAIIIARBA3RqIgRBACAAKAIMIARLGzYCCCAHIAEQiICAgAAiBGogA2ogBmogBEEfdSAEcWtBAWohBAsgASAFNgIAIAEgAkEHdkEBcSACQQZ2QQFxaiACQQh2QQFxaiACQQl2QQFxaiACQQp2QQFxaiAEQR5qIAQgAkEgcRtqIgI2AgQgASAAKAIIIAJBA3RqIgJBACAAKAIMIAJLGzYCCCABEIiAgIAAQX9GDQBBuoCIgAAQgICAgAAACyABQRBqJICAgIAAQQALQAEBf0EAQQAtAOCAiIAAIgBBAWo6AOCAiIAAIABBAnRB8ICIgABqQYGAgIAANgIAQYCAiIAAIAAQgYCAgABBAAsIABCKgICAAAsLVwEBVChob29rKSA9PiB7IElOSi5wdXNoKChiYXNlKSA9PiB7IGhvb2soYmFzZSArIDB4NzgpOyB9KTsgfQBpbnZhbGlkIHBhcnNpbmcgb2YgcGFja2V0AA==");

@@ -11,8 +11,7 @@ volatile void* calldest(void* raw) {
     fastwordview_t word;
     str_t str_value;
 
-    packet->view(&word, offset++);
-    word.getSTRValue(&str_value);
+    packet->view(&word, offset++)->getSTRValue(&str_value);
 
     char header = *str_value.content;
     if (header == 'u') {

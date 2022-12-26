@@ -1,6 +1,7 @@
 #pragma once
 
 #include "wasm.h"
+#include "link.hh"
 
 int strlen(const char* str) {
     int i = 0;
@@ -93,3 +94,23 @@ public:
         return this->at(idx);
     }
 };
+
+inline void __unreachable__() {
+    asm("unreachable");
+}
+
+
+void abort() {
+    __unreachable__();
+}
+
+void assert(bool_t passes) {
+    if (passes == false) abort();
+}
+
+void assert(bool_t passes, const char* message) {
+    if (passes == false) {
+        ALERT(message);
+        abort();
+    }
+}

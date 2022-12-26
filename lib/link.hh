@@ -41,3 +41,4 @@ __attribute__((import_module("env"), import_name("d"))) void DEBUGGER();
 __attribute__((import_module("env"), import_name("ls"))) void LOG(const char* string);
 __attribute__((import_module("env"), import_name("lf"))) void LOG(f32_t value);
 __attribute__((import_module("env"), import_name("li"))) void LOG(i32_t value);
+__attribute__((import_module("env"), import_name("as"))) void ALERT(const char* string);

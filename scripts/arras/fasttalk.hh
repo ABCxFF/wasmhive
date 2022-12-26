@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../lib/wasm.h"
+#include "../../lib/stdlib.hh"
 #include "rust.hh"
 
 enum fastwordtype_t {
@@ -111,7 +112,7 @@ struct fastwordview_t {
         }
 
         // unreachable
-        return 0;
+        abort();
     }
 
     // #psuedocode
@@ -140,7 +141,7 @@ struct fastwordview_t {
         }
 
         // unreachable
-        return 0.0;
+        abort();
     }
 
     // #psuedocode
@@ -177,21 +178,25 @@ struct fasttalker_t : raw_fasttalker_t {
         return pos;
     }
 
-    void view(fastwordview_t* out, i32_t offset) {
+    fastwordview_t* view(fastwordview_t* out, i32_t offset) {
         raw_fastword_t* raw = this->getRaw(offset);
         fastcipher_t* cipher = (fastcipher_t*) &this->cipher;
 
         out->raw = raw;
         out->cipher = cipher;
         out->offset = offset;
+        
+        return out;
     }
 
-    void view(fastwordview_t* out, i32_t offset, i32_t offset_offset) {
+    fastwordview_t* view(fastwordview_t* out, i32_t offset, i32_t offset_offset) {
         raw_fastword_t* raw = this->getRaw(offset);
         fastcipher_t* cipher = (fastcipher_t*) &this->cipher;
 
         out->raw = raw;
         out->cipher = cipher;
         out->offset = offset + offset_offset;
+
+        return out;
     }
 };

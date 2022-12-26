@@ -29,16 +29,15 @@ __DESTCODE__ LINK_CALLDEST(__CALLDEST__ DEST) {
     return __CALLDEST_CNT__++;
 };
 
+
 /**
  * Layer 1 of the link between c++ and js script code
  */
-
-
-__attribute__((import_module("env"), import_name("evalwithref"))) void __EVALWITHREF__(const char* evaluation, __DESTCODE__ dest);
+__attribute__((import_module("env"), import_name("e"))) void __EVALWITHREF__(const char* evaluation, __DESTCODE__ dest);
 
 #define EVAL_LINK(calldest, ...) __EVALWITHREF__(#__VA_ARGS__, LINK_CALLDEST(calldest))
 
-__attribute__((import_module("env"), import_name("debugger"))) void DEBUGGER();
-__attribute__((import_module("env"), import_name("logstr"))) void LOG(const char* string);
-__attribute__((import_module("env"), import_name("logf32"))) void LOG(f32_t value);
-__attribute__((import_module("env"), import_name("logi32"))) void LOG(i32_t value);
+__attribute__((import_module("env"), import_name("d"))) void DEBUGGER();
+__attribute__((import_module("env"), import_name("ls"))) void LOG(const char* string);
+__attribute__((import_module("env"), import_name("lf"))) void LOG(f32_t value);
+__attribute__((import_module("env"), import_name("li"))) void LOG(i32_t value);

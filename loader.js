@@ -93,7 +93,7 @@ const loadModules = async (bytecode) => {
   let evalwithref = null;
 
   const wmod = await WebAssembly.compile(bytecode);
-    // for evalling
+  // for evalling
   const HEAPU8 = () => new Uint8Array(memory.buffer);
   const HEAP32 = () => new Int32Array(memory.buffer);
   const HEAP64 = () => new BigInt64Array(memory.buffer);
@@ -105,11 +105,11 @@ const loadModules = async (bytecode) => {
   const wasm = await WebAssembly.instantiate(wmod, {
     env: {
       memory,
-      debugger: () => {debugger},
-      logstr: (addr) => top.console.log(decodeFromMemory(addr)),
-      logf32: (val) =>top.console.log(val),
-      logi32: (val) => top.console.log(val),
-      evalwithref: (...argv) => evalwithref(...argv)
+      d: () => {debugger},
+      ls: (addr) => top.console.log(decodeFromMemory(addr)),
+      lf: (val) =>top.console.log(val),
+      li: (val) => top.console.log(val),
+      e: (...argv) => evalwithref(...argv)
     }
   });
   // for evalling

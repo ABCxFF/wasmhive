@@ -166,7 +166,7 @@ const loadModules = async (bytecode) => {
   let evalwithref = null;
 
   const wmod = await WebAssembly.compile(bytecode);
-    // for evalling
+  // for evalling
   const HEAPU8 = () => new Uint8Array(memory.buffer);
   const HEAP32 = () => new Int32Array(memory.buffer);
   const HEAP64 = () => new BigInt64Array(memory.buffer);
@@ -178,11 +178,11 @@ const loadModules = async (bytecode) => {
   const wasm = await WebAssembly.instantiate(wmod, {
     env: {
       memory,
-      debugger: () => {debugger},
-      logstr: (addr) => top.console.log(decodeFromMemory(addr)),
-      logf32: (val) =>top.console.log(val),
-      logi32: (val) => top.console.log(val),
-      evalwithref: (...argv) => evalwithref(...argv)
+      d: () => {debugger},
+      ls: (addr) => top.console.log(decodeFromMemory(addr)),
+      lf: (val) =>top.console.log(val),
+      li: (val) => top.console.log(val),
+      e: (...argv) => evalwithref(...argv)
     }
   });
   // for evalling
@@ -198,4 +198,4 @@ const loadModules = async (bytecode) => {
 
   if (wasm.exports.main) wasm.exports.main();
 };
-loadModules("AGFzbQEAAAABHAZgAX8Bf2ABfwBgAn9/AGAAAGACf38Bf2AAAX8CMQMDZW52Bm1lbW9yeQIDEoCABANlbnYGbG9nc3RyAAEDZW52C2V2YWx3aXRocmVmAAIDCgkDAAEAAAQABQQEBQFwAQICBg0CfwFBgIAIC38BQQALBywGBm1hbGxvYwAGBGZyZWUABARwdXNoAAUDcG9wAAMEY2FsbAAHBG1haW4ACggBAgkHAQBBAQsBCAwBAQqLBAlbAAJAAkACQEHQiAhBAEEB/kgCAA4CAAECC0GAgAhBAEE6/AgAAEHAgAhBAEGQCPwLAEHQiAhBAv4XAgBB0IgIQX/+AAIAGgwBC0HQiAhBAUJ//gECABoL/AkACw4AIwAPIAAkACMAD0EACwIACw4AIwAPIAAkACMAD0EACwQAQQALJgACQCAAQQJ0QdCAiIAAaigCACIADQBBfw8LIAEgABGAgICAAAALlQIBBX8jgICAgABBIGsiASSAgICAACAAIAAoAgAiAjYCCEEAIQMgAkEAIAAoAgwgAksbKAIEIQQgAEEYaigCACECIABBFGooAgAhBSAAKAIQIQAgAUEYakIANwMAIAFBEGpCADcDACABQgA3AwAgAUIANwMIIAFB4AA6AAAgBCACIAUgAiAAIAVsamxqcyIAQQEgAEF+akH9////B0kbLQAAIQAgAUHgADoAAiABIAA6AAEDQCABIANqIQAgA0EBaiICIQMgAC0AAA0ACyABIAJqIgNBD2pBLjsAACADQQdqQuncjfvWrZq35wA3AAAgA0F/akKg4IWbtq2ZuiA3AAAgARCAgICAACABQSBqJICAgIAAQQALQAEBf0EAQQAtAMCAiIAAIgBBAWo6AMCAiIAAIABBAnRB0ICIgABqQYGAgIAANgIAQYCAiIAAIAAQgYCAgABBAAsIABCJgICAAAsLPQEBOihob29rKSA9PiB7IElOSi5wdXNoKChiYXNlKSA9PiB7IGhvb2soYmFzZSArIDB4NzgpOyB9KTsgfQA=");
+loadModules("AGFzbQEAAAABHAZgAX8Bf2ABfwBgAn9/AGAAAGACf38Bf2AAAX8CIwMDZW52Bm1lbW9yeQIDEoCABANlbnYCbHMAAQNlbnYBZQACAwoJAwABAAAEAAUEBAUBcAECAgYNAn8BQYCACAt/AUEACwcsBgZtYWxsb2MABgRmcmVlAAQEcHVzaAAFA3BvcAADBGNhbGwABwRtYWluAAoIAQIJBwEAQQELAQgMAQEKiwQJWwACQAJAAkBB0IgIQQBBAf5IAgAOAgABAgtBgIAIQQBBOvwIAABBwIAIQQBBkAj8CwBB0IgIQQL+FwIAQdCICEF//gACABoMAQtB0IgIQQFCf/4BAgAaC/wJAAsOACMADyAAJAAjAA9BAAsCAAsOACMADyAAJAAjAA9BAAsEAEEACyYAAkAgAEECdEHQgIiAAGooAgAiAA0AQX8PCyABIAARgICAgAAAC5UCAQV/I4CAgIAAQSBrIgEkgICAgAAgACAAKAIAIgI2AghBACEDIAJBACAAKAIMIAJLGygCBCEEIABBGGooAgAhAiAAQRRqKAIAIQUgACgCECEAIAFBGGpCADcDACABQRBqQgA3AwAgAUIANwMAIAFCADcDCCABQeAAOgAAIAQgAiAFIAIgACAFbGpsanMiAEEBIABBfmpB/f///wdJGy0AACEAIAFB4AA6AAIgASAAOgABA0AgASADaiEAIANBAWoiAiEDIAAtAAANAAsgASACaiIDQQ9qQS47AAAgA0EHakLp3I371q2at+cANwAAIANBf2pCoOCFm7atmbogNwAAIAEQgICAgAAgAUEgaiSAgICAAEEAC0ABAX9BAEEALQDAgIiAACIAQQFqOgDAgIiAACAAQQJ0QdCAiIAAakGBgICAADYCAEGAgIiAACAAEIGAgIAAQQALCAAQiYCAgAALCz0BATooaG9vaykgPT4geyBJTkoucHVzaCgoYmFzZSkgPT4geyBob29rKGJhc2UgKyAweDc4KTsgfSk7IH0A");

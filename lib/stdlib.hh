@@ -30,3 +30,66 @@ void bzero(void* buffer, u32_t size) {
         ((char*) buffer)[i] = 0;
     };
 };
+
+template <typename T, i32_t cap>
+class static_vector {
+    T* content = mass;
+    i32_t length = 0;
+    T mass[cap];
+
+public:
+    i32_t size() {
+        return this->length;
+    }
+    i32_t capacity() {
+        return cap;
+    }
+    T* data() {
+        return this->content;
+    }
+    i32_t max_size() {
+        return cap;
+    }
+    bool_t empty() {
+        return this->size() == 0;
+    }
+    void clear() {
+        this->length = 0;
+    }
+    bool_t insert(i32_t idx, const T& value) {
+        if (idx < 0 || idx > this->length) return false;
+        if (this->length + 1 > cap) return false;
+
+        this->length += 1;
+        i32_t pos = this->length + 1;
+        while (pos --> idx) {
+            this->content[pos] = this->content[pos - 1];
+        }
+        this->content[pos] = value;
+
+        return true;
+    }
+    bool_t push_back(const T& value) {
+        return this->insert(this->length, value);
+    }
+    bool_t erase(i32_t idx) {
+        if (idx < 0 || idx >= this->length) return false;
+
+        while (++idx < this->length - 1) {
+            this->content[idx - 1] = this->content[idx];
+        }
+
+        this->length -= 1;
+
+        return true;
+    }
+    void pop_back() {
+        this->erase(this->length - 1);
+    }
+    T& at(i32_t idx) {
+        return this->content[idx];
+    }
+    T& operator[](i32_t idx) {
+        return this->at(idx);
+    }
+};
